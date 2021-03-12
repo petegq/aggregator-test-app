@@ -2,6 +2,7 @@ import React from "react";
 import Adapter from "enzyme-adapter-react-16";
 import { mount, configure } from "enzyme";
 import "jest-enzyme";
+import { act } from 'react-dom/test-utils';
 import branch1 from "../public/api/branch1.json";
 import branch2 from "../public/api/branch2.json";
 import branch3 from "../public/api/branch3.json";
@@ -33,56 +34,72 @@ export const flushRequestsAndUpdate = async enzymeWrapper => {
   enzymeWrapper.update();
 };
 
-it("renders without crashing", () => {
-  mount(<App />);
+it("renders without crashing", async () => {
+  await act(async () => mount(<App />));
 });
 
 it("renders loading text initially", async () => {
-  const app = mount(<App />);
-  expect(app).toHaveText("Loading...");
+  await act(async () => {
+    const app = mount(<App />)
+    expect(app).toHaveText("Loading...");
+  })
 });
 
 it("renders a table after data load", async () => {
-  const app = mount(<App />);
-  expect(app).toHaveText("Loading...");
-  await flushRequestsAndUpdate(app);
-  expect(app.find("table")).toExist();
+    await act(async () => {
+      const app = mount(<App />);
+      expect(app).toHaveText("Loading...");
+      await flushRequestsAndUpdate(app)
+          .then(async () => {
+            expect(await app.find("table")).toExist();
+          })
+          .catch(e => console.log("Error in 'renders a table after data load'", e));
+    });
 });
 
 it("renders rows with product name as key", async () => {
-  const app = mount(<App />);
-  await flushRequestsAndUpdate(app);
-
-  expect(
-    app
-      .find("table tbody tr")
-      .at(56)
-      .key()
-  ).toEqual("Hominy");
-  expect(
-    app
-      .find("table tbody tr")
-      .at(73)
-      .key()
-  ).toEqual("Lychee");
+  await act(async () => {
+    const app = mount(<App />);
+    await flushRequestsAndUpdate(app)
+        .then(async () => {
+          expect(await app.find("table tbody tr").key.at(56).key()).toEqual("Hominy");
+          expect(await app.find("table tbody tr").key.at(73).key()).toEqual("Lychee");
+        })
+        .catch(e => console.log("Error in 'renders rows with product name as key'", e));
+  });
 });
 
 it("renders table that is sorted ascending", async () => {
-  const app = mount(<App />);
-  await flushRequestsAndUpdate(app);
-  expect(app.find("table")).toMatchSnapshot();
+  await act(async () => {
+    const app = mount(<App />);
+    await flushRequestsAndUpdate(app)
+        .then(async () => {
+          expect(await app.find("table")).toMatchSnapshot();
+        })
+        .catch(e => console.log("Error in 'renders table that is sorted ascending'", e));
+  })
 });
 
 it("calculates total revenue of all branches", async () => {
-  const app = mount(<App />);
-  await flushRequestsAndUpdate(app);
-  expect(app.find("tfoot td:last-child").text()).toEqual("2,102,619.44");
+  await act(async () => {
+    const app = mount(<App />);
+    await flushRequestsAndUpdate(app)
+        .then(async () => {
+          expect(await app.find("tfoot td:last-child").text()).toEqual("2,102,619.44")
+        })
+        .catch(e => console.log("Error in 'calculates total revenue of all branches'", e));
+  })
 });
 
 it("filters the displayed products", async () => {
-  const app = mount(<App />);
-  await flushRequestsAndUpdate(app);
-  const changeEvent = { target: { value: "pear" } };
-  app.find("input").simulate("change", changeEvent);
-  expect(app.find("tfoot td:last-child").text()).toEqual("60,681.02");
+  await act(async () => {
+    const app = mount(<App />);
+    await flushRequestsAndUpdate(app)
+        .then(async () => {
+          const changeEvent = { target: { value: "pear" } };
+          await app.find("input").simulate("change", changeEvent);
+          expect(await app.find("tfoot td:last-child").text()).toEqual("60,681.02");
+        })
+        .catch(e => console.log("Error in 'filters the displayed products'", e));
+  })
 });
