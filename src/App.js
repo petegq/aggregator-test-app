@@ -6,9 +6,9 @@ import "./App.css";
 // so I hope you don't mind that I went through and
 // refactored them quite a bit inc. adding quite a lot
 // async/await and act() in various places. The snapshot
-// seemed out of date too so I updated it also. I'm obviously
+// seemed out of date too so I updated it as well. I'm obviously
 // unsure if that's what you were looking for. If it was or it
-// wasn't let have a chat about it :)
+// wasn't lets have a chat about it :)
 // Thanks for the test anyway and hopefully chat soon.
 // Best,
 // Peter
